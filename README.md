@@ -1,1 +1,1 @@
-Doc reference: https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=elements&client=react
+Doc reference: https://medium.com/@f.pitterling/stripe-integration-with-react-flask-e7aac635b139
