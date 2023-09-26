@@ -1,33 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import './App.css'
+import CheckoutForm from './CheckoutForm'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [message, setMessage] = useState('')
+  const [clientSecret, setClientSecret] = useState("")
+
+  const stripePromise = loadStripe('pk_test_51NuOQmC0RAqcCFTGNk6L6gWZoOhKCLA5VFZ7imbVcrlDylknNmNi9vPrYwnkiU82wcShq7prCJl8Ww9xlBACYFdT005fyHqdyH')
+
+  const getIndex = async () => {
+    const res = await fetch('/api')
+    const mess = await res.json()
+    console.log("🚀 ~ file: App.jsx:14 ~ getIndex ~ mess:", mess)
+    setMessage(mess.message)
+  }
+
+  const getClientSecret = async () => {
+    const res = await fetch('/api/payment_intent/new')
+    const { client_secret: clientSecret } = await res.json()
+    setClientSecret(clientSecret)
+  } 
+  useEffect(() => {
+
+    // getIndex()
+    getClientSecret()
+  
+  }, [])
+
+  const appearance = {
+    theme: 'night',
+  }
+
+  const options = {
+    clientSecret,
+    appearance
+  }
+  
+  if (!clientSecret) return <h1>Loading...</h1>
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Elements stripe={stripePromise} options={options}>
+        <CheckoutForm />
+      </Elements>
     </>
   )
 }
