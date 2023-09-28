@@ -9,22 +9,31 @@ import PaymentStatus from './PaymentStatus'
 import { Routes, Route } from "react-router-dom";
 
 function App({ stripePr }) {
-  const [count, setCount] = useState(0)
+  const [quantity, setQuantity] = useState(1)
   const [clientSecret, setClientSecret] = useState("")
 
 
 
   const getClientSecret = async () => {
-    const res = await fetch('/api/payment_intent/new')
-    const { client_secret: clientSecret } = await res.json()
-    setClientSecret(clientSecret)
+    const config = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ quantity: parseInt(quantity) })
+    }
+    if (quantity && quantity > 0) {
+      const res = await fetch('/api/payment_intent/new', config)
+      const { client_secret: clientSecret } = await res.json()
+      setClientSecret(clientSecret)
+    }
   } 
   useEffect(() => {
 
     // getIndex()
     getClientSecret()
   
-  }, [])
+  }, [quantity])
 
   const appearance = {
     theme: 'night',
@@ -40,9 +49,14 @@ function App({ stripePr }) {
   return (
     <>
       <Nav />
-      <Elements stripe={stripePr} options={options}>
+      <Elements stripe={stripePr} options={options} key={clientSecret}>
         <Routes>
-            <Route path="/shop?" element={<Cart />} />
+            <Route path="/shop?" element={
+              <Cart 
+                quantity={quantity}
+                onSelectQuantity={setQuantity}
+                createPaymentIntent={getClientSecret}
+                />} />
             <Route 
               path="/checkout"
               element={

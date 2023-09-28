@@ -8,6 +8,8 @@ const CheckoutForm = ({secret}) => {
   const elements = useElements();
   const navigate = useNavigate();
 
+  console.log("CheckoutForm rerender")
+
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSubmit = async (event) => {

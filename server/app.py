@@ -16,9 +16,12 @@ def index():
     return jsonify({"message": "Hello"})
 
 
-@app.route("/payment_intent/new")
+@app.route("/payment_intent/new", methods=["POST"])
 def create_payment_intent():
-    intent = stripe.PaymentIntent.create(amount=1099, currency="usd")
+    request_json = request.get_json()
+    total = request_json.get("quantity") * 399
+    intent = stripe.PaymentIntent.create(amount=total, currency="usd")
+    print(intent)
     return jsonify(client_secret=intent.client_secret)
 
 
